@@ -14,9 +14,11 @@ int check_version(FILE *fp);
 
 int read_integers(int size, FILE *fp);
 
-void read_character_data(int *size,char *data, FILE *fp);
+void read_character_data(int size,char *data, FILE *fp);
 
 void read_encode_BOM(int *size, FILE *fp);
+
+int frame_data(FILE *fp);
 /**
 TODO: Add documention as sample given
  */

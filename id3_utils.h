@@ -1,6 +1,8 @@
 #ifndef ID3_UTILS_H
 #define ID3_UTILS_H
 
+#define FRAMES 7
+
 #include <stdio.h>
 /**
  * @brief Structure to hold ID3 tag data.
@@ -14,6 +16,7 @@ typedef struct {
     char *comment; /**< Comment */
     char *genre;   /**< Genre */
     // Add other fields as needed
+    char *composer;
     //File details
     FILE *fptr; /**< File pointer */
 } TagData;

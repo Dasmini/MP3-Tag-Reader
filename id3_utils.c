@@ -16,6 +16,7 @@ TagData* create_tag_data() {
         data->comment = NULL;
         data->genre = NULL;
         // Initialize other fields as needed
+        data->composer = NULL;
         data->fptr = NULL;
     }
     return data;
