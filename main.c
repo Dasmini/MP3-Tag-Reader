@@ -18,7 +18,13 @@ void display_help() {
     printf("Options:\n");
     printf("  -h               Display help\n");
     printf("  -v               View tags\n");
-    printf("  -e -t/-T/-a/-A/-y/-c/-g <value>  Edit tags\n");
+    printf("  -e -t/-a/-A/-y/-c/-g <value>  Edit tags\n");
+    printf("-t -> Title\n");
+    printf("-A -> Artist\n");
+    printf("-a -> Album\n");
+    printf("-g -> Genre\n");
+    printf("-c -> Composer\n");
+    printf("-y -> Year\n");
 }
 
 /**

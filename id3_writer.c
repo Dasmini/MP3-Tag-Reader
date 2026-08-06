@@ -183,7 +183,7 @@ int edit_tag(const char *filename, const char *tag, const char *value) {
     FILE *temp_fp, *fp;
     fp = fopen(filename, "rb");
     temp_fp = fopen("temp.mp3", "wb");
-    if(!strcmp(tag, "-t") || !strcmp(tag, "-T"))
+    if(!strcmp(tag, "-t"))
     {
         printf("Editing Title...\n");
         read_till_frame("TIT2", value, fp, temp_fp);
