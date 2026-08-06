@@ -19,6 +19,8 @@ void read_character_data(int size,char *data, FILE *fp);
 void read_encode_BOM(int *size, FILE *fp);
 
 int frame_data(FILE *fp);
+
+char *get_byte_red_size(int *size, int bytes , FILE *fp);
 /**
 TODO: Add documention as sample given
  */

@@ -185,12 +185,33 @@ int edit_tag(const char *filename, const char *tag, const char *value) {
     temp_fp = fopen("temp.mp3", "wb");
     if(!strcmp(tag, "-t") || !strcmp(tag, "-T"))
     {
-        //Read till TIT2
+        printf("Editing Title...\n");
         read_till_frame("TIT2", value, fp, temp_fp);
     }
     else if(!strcmp(tag, "-y"))
     {
+        printf("Editing Year...\n");
         read_till_frame("TYER", value, fp, temp_fp);
+    }
+    else if(!strcmp(tag, "-A"))
+    {
+        printf("Editing Artist...\n");
+        read_till_frame("TPEI", value, fp, temp_fp);
+    }
+    else if(!strcmp(tag, "-a"))
+    {
+        printf("Editing Album...\n");
+        read_till_frame("TALB", value, fp, temp_fp);
+    }
+    else if(!strcmp(tag, "-g"))
+    {
+        printf("Editing Genre...\n");
+        read_till_frame("TCON", value, fp, temp_fp);
+    }
+    else if(!strcmp(tag, "-c"))
+    {
+        printf("Editing Composer...\n");
+        read_till_frame("TCOM", value, fp, temp_fp);
     }
     
     fclose(fp);

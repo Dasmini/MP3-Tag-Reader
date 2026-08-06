@@ -86,8 +86,7 @@ void read_character_data(int size,char *data, FILE *fp)
 
 void read_encode_BOM(int *size, FILE *fp)
 {
-    int enc;
-    switch(enc = fgetc(fp))
+    switch(fgetc(fp))
     {
         case 0:
             return;
@@ -99,7 +98,6 @@ void read_encode_BOM(int *size, FILE *fp)
         case 2:
             return;
         default:
-            printf("Enc is %d\n",enc);
             printf("Encode byte found not for ID3V2.3!\n");
             break;
     }
@@ -113,6 +111,22 @@ int frame_data(FILE *fp)
     read_encode_BOM(&size, fp);
 
     return size;
+}
+char *get_byte_red_size(int *size, int bytes , FILE *fp)
+{
+    char *ch = malloc(bytes + 1);
+    if(ch == NULL)
+    {
+        printf("Memory allocation Failed!\n");
+        return NULL;
+    }    
+    for (int i = 0; i < bytes; i++)
+    {
+        ch[i] = getc(fp);
+        (*size)--;
+    }
+    ch[bytes] = '\0';
+    return ch;
 }
 
 /**
@@ -161,38 +175,61 @@ TagData* read_id3_tags(const char *filename) {
         {
             int size = read_integers(4, fp);
             read_integers(2, fp);    // 2 byte for flag in frame header
-            for(int i = 0; i < size; i++)
-            {
-                fgetc(fp);
-            }
-           /* int ch, encoding_byte;
-            char lang[4];
-            int size = read_integers(4, fp);
-            read_integers(2, fp);    // 2 byte for flag in frame header
             // Inside data
-            encoding_byte = getc(fp);   // data flag - 1 byte ( size -1)
-            
-            read_character_data(3, lang , fp);  //(size - 3)
-            if(strcmp(lang, "eng") == 0)
+            char *encoding_byte, *lang_code;
+            int ch[2];
+            encoding_byte = get_byte_red_size(&size, 1 , fp);
+            lang_code = get_byte_red_size(&size, 3 , fp);
+            if(encoding_byte == NULL || lang_code == NULL)
             {
-                if(encoding_byte == 1)  //this means 2 byte BOM
-                {
-                    for (int i = 0; i < 4; i ++)
-                    {
-                        getc(fp);
-                    }
-                }
-                size = size - 12; // after all the bytes before the actual data
+                printf("Comment reading failed!\n");
                 for(int i = 0; i < size; i++)
                 {
-                ch = getc(fp);
-                printf("%02X ",ch);
+                fgetc(fp);
                 }
+                continue;
             }
-            else
+            if(strcmp(lang_code, "eng"))
             {
-                printf("Language is not english! This MP3 reader supports only English comments bruh!\n");
-            }*/
+                printf("Comment Language is not english! Unable to read!\n");
+                for(int i = 0; i < size; i++)
+                {
+                fgetc(fp);
+                }
+                continue;
+            }
+            if(encoding_byte[0] == 1)
+            {
+                getc(fp);
+                getc(fp);
+                size -= 2;
+            }
+            //printf("Size is %d , Pos is %ld\n", size, ftell(fp));
+            if(encoding_byte[0] == 0)
+            {
+                do
+                {
+                    ch[0] = getc(fp);
+                    size--;
+                }while(ch[0] != '\0');
+            }
+            if(encoding_byte[0] == 1)
+            {
+                do{
+                    ch[0] = getc(fp);
+                    ch[1] = getc(fp);
+                    size -= 2;
+                }while(ch[0] != '\0' || ch[1] != '\0');
+            }
+            if(encoding_byte[0] == 1)
+            {
+                getc(fp);
+                getc(fp);
+                size -= 2;
+            }
+            data -> comment = malloc(size + 1);
+            read_character_data(size, data ->comment , fp); 
+            printf("Size is %d , Pos is %ld\n", size, ftell(fp));
             
         }
         if(strcmp(ch, "TCOM") == 0)
