@@ -204,7 +204,7 @@ TagData* read_id3_tags(const char *filename) {
                 getc(fp);
                 size -= 2;
             }
-            //printf("Size is %d , Pos is %ld\n", size, ftell(fp));
+            
             if(encoding_byte[0] == 0)
             {
                 do
@@ -229,7 +229,7 @@ TagData* read_id3_tags(const char *filename) {
             }
             data -> comment = malloc(size + 1);
             read_character_data(size, data ->comment , fp); 
-            printf("Size is %d , Pos is %ld\n", size, ftell(fp));
+            free(ch);
             
         }
         if(strcmp(ch, "TCOM") == 0)
@@ -298,12 +298,6 @@ TODO: Add documention as sample given
  */
 void view_tags(const char *filename) {
     TagData *data;
-    /*if(open_read_file(filename, data))
-        printf("File opened successfully\n");
-    else{
-        printf("Failed to open file");
-        return;
-    }*/
     data = read_id3_tags(filename);
     if (!data) {
         display_error("Failed to read ID3 tags.\n");

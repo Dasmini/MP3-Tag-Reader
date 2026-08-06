@@ -79,7 +79,6 @@ char *get_encode_BOM(int *value_size, int *size, FILE *fp)
             *(ch + 2) = '\0';
             break;
         default:
-            printf("Enc is %d\n",enc);
             printf("Encode byte found not for ID3V2.3!\n");
             break;
     }
@@ -125,13 +124,9 @@ void read_till_frame(const char *frame, const char *value, FILE *fp, FILE *temp_
         {
             char flag_value[2] = {0, 0};
             size = read_size(4, fp);
-            printf("Original frame size : %d\n", size);
             skip_bytes(2, fp);
             int value_size = strlen(value) + 1;
-            printf("New frame size      : %d\n", value_size);
             char *encode_content = get_encode_BOM(&value_size, &size, fp);
-            printf("Remaining after BOM : %d\n", size);
-            printf("New frame size after BOM : %d\n", value_size);
             skip_bytes(size, fp);
             write_size_msb(value_size, temp_fp);
             fwrite(&flag_value, 2, 1, temp_fp);
