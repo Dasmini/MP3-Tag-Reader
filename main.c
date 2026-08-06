@@ -38,11 +38,13 @@ int main(int argc, char *argv[]) {
         display_help();
         return 0;
     } else if (strcmp(argv[1], "-v") == 0 && argc == 3) {
+        printf("--------------SELECTED VIEW DETAILS------------------\n");
         view_tags(argv[2]);
     } else if (strcmp(argv[1], "-e") == 0 && argc == 5) {
         char *tag = argv[2];
-        char *filename = argv[3];
-        char *value = argv[4];
+        char *filename = argv[4];
+        char *value = argv[3];
+        printf("--------------SELECTED EDIT DETAILS------------------\n");
         if (edit_tag(filename, tag, value) != 0) {
             display_error("Failed to edit tag.");
             return 1;

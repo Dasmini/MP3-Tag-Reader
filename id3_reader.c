@@ -86,7 +86,8 @@ void read_character_data(int size,char *data, FILE *fp)
 
 void read_encode_BOM(int *size, FILE *fp)
 {
-    switch(fgetc(fp))
+    int enc;
+    switch(enc = fgetc(fp))
     {
         case 0:
             return;
@@ -98,6 +99,7 @@ void read_encode_BOM(int *size, FILE *fp)
         case 2:
             return;
         default:
+            printf("Enc is %d\n",enc);
             printf("Encode byte found not for ID3V2.3!\n");
             break;
     }
@@ -145,9 +147,6 @@ TagData* read_id3_tags(const char *filename) {
         printf("Tag %d : %s\n", i, ch);
         if(strcmp(ch, "TALB") == 0)
         {
-            /*int size = read_integers(4, fp);
-            read_integers(2, fp);  // To read and skip the flag bytes
-            read_encode_BOM(&size, fp);*/
             int size = frame_data(fp);
             data -> album = malloc(size + 1);
             read_character_data(size, data -> album, fp);    
@@ -217,13 +216,14 @@ TagData* read_id3_tags(const char *filename) {
         if(strcmp(ch, "TYER") == 0)
         {
             int size = frame_data(fp);
+            printf("Size of year frame is %d\n",size);
             data -> year = malloc(size + 1);
             read_character_data(size, data ->year , fp);
         }
     }
     
 
-
+    fclose(fp);
     return data;
 }
 
@@ -232,13 +232,18 @@ TODO: Add documention as sample given
  */
 void display_metadata(const TagData *data) {
     // Implementation for displaying metadata
-    printf("Title : %s\n", data -> title);
-    printf("Artist : %s\n", data -> artist);
-    printf("Album : %s\n", data -> album);
-    printf("Year : %s\n", data -> year);
-    printf("Genre : %s\n", data -> genre);
-    printf("Comment : %s(not yet decoded)\n", data -> comment);
-    printf("Composer : %s\n", data -> composer);
+    printf("---------------------------------------------------------------------\n");
+    printf("----------------MP3 TAG READER AND EDITOR FOR ID3V2.3----------------\n");
+    printf("---------------------------------------------------------------------\n");
+    printf("Title      :       %s\n", data -> title);
+    printf("Artist     :       %s\n", data -> artist);
+    printf("Album      :       %s\n", data -> album);
+    printf("Year       :       %s\n", data -> year);
+    printf("Genre      :       %s\n", data -> genre);
+    printf("Comment    :       %s(not yet decoded)\n", data -> comment);
+    printf("Composer   :       %s\n", data -> composer);
+    printf("---------------------------------------------------------------------\n");
+    printf("--------------------DETAILS DISPLAYED SUCCESSFULLY-------------------\n");
 }
 
 /**
