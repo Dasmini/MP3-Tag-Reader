@@ -229,7 +229,8 @@ TagData* read_id3_tags(const char *filename) {
             }
             data -> comment = malloc(size + 1);
             read_character_data(size, data ->comment , fp); 
-            free(ch);
+            free(encoding_byte);
+            free(lang_code);
             
         }
         if(strcmp(ch, "TCOM") == 0)
@@ -253,7 +254,6 @@ TagData* read_id3_tags(const char *filename) {
         if(strcmp(ch, "TYER") == 0)
         {
             int size = frame_data(fp);
-            printf("Size of year frame is %d\n",size);
             data -> year = malloc(size + 1);
             read_character_data(size, data ->year , fp);
         }
@@ -277,7 +277,7 @@ void display_metadata(const TagData *data) {
     printf("Album      :       %s\n", data -> album);
     printf("Year       :       %s\n", data -> year);
     printf("Genre      :       %s\n", data -> genre);
-    printf("Comment    :       %s(not yet decoded)\n", data -> comment);
+    printf("Comment    :       %s\n", data -> comment);
     printf("Composer   :       %s\n", data -> composer);
     printf("---------------------------------------------------------------------\n");
     printf("--------------------DETAILS DISPLAYED SUCCESSFULLY-------------------\n");

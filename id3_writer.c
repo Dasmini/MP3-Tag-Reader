@@ -54,15 +54,13 @@ char *get_encode_BOM(int *value_size, int *size, FILE *fp)
     switch(enc = fgetc(fp))
     {
         case 0:
-            printf("Inside 0\n");
             *value_size += 1;
             *size -=1;
             *ch = 1;
             *(ch + 1) = enc;
             *(ch + 2) = '\0';
             break;
-        case 1:
-            printf("Inside 1\n");   
+        case 1: 
             *ch = 3;
             *(ch + 1) = enc;
             *(ch + 2) = fgetc(fp);
@@ -95,7 +93,6 @@ void write_size_msb(int size, FILE *temp_fp)
     size_bytes[3] = size & 0xFF;
 
     fwrite(size_bytes, 4, 1, temp_fp);
-    printf("%s\n", size_bytes);
 }
 
 void write_rem_data(FILE *fp, FILE *temp_fp)
@@ -107,7 +104,7 @@ void write_rem_data(FILE *fp, FILE *temp_fp)
     }
 }
 
-void read_till_frame(const char *frame, const char *value, FILE *fp, FILE *temp_fp)
+int read_till_frame(const char *frame, const char *value, FILE *fp, FILE *temp_fp)
 {
     /* read header 10 bytes*/
     char ch[10];
@@ -119,7 +116,6 @@ void read_till_frame(const char *frame, const char *value, FILE *fp, FILE *temp_
         fread(ch, 4, 1, fp);
         ch[4] = '\0';
         fwrite(ch, 4, 1, temp_fp);
-        printf("Tag %d : %s\n", i, ch);
         if(strcmp(ch, frame) == 0)
         {
             char flag_value[2] = {0, 0};
@@ -159,11 +155,21 @@ void read_till_frame(const char *frame, const char *value, FILE *fp, FILE *temp_
         
     }
     write_rem_data(fp, temp_fp);
-    return;
+    return 1;
 }
 
-int write_id3_tags(const char *filename, const TagData *data) {
+int write_id3_tags(const char *filename, const char *frame, const char *value) {
     // Implementation for writing ID3 tags
+    FILE *temp_fp, *fp;
+    fp = fopen(filename, "rb");
+    temp_fp = fopen("temp.mp3", "wb");
+    int read_result;
+    read_result = read_till_frame(frame, value, fp, temp_fp);
+
+    fclose(fp);
+    fclose(temp_fp);
+    if(read_result)
+        return 1;
     return 0;
 }
 
@@ -173,42 +179,70 @@ int edit_tag(const char *filename, const char *tag, const char *value) {
     if (!data) {
         return 1;
     }*/
-    // Implementation for writing ID3 tags to file
-    //-t/-T/-a/-A/-y/-c/-g
-    FILE *temp_fp, *fp;
-    fp = fopen(filename, "rb");
-    temp_fp = fopen("temp.mp3", "wb");
+
+    
+    printf("------------SELECTED EDIT OPTION--------------\n");
     if(!strcmp(tag, "-t"))
     {
-        printf("Editing Title...\n");
-        read_till_frame("TIT2", value, fp, temp_fp);
+        printf("------------CHANGE THE TITLE--------------\n");
+        if(write_id3_tags(filename, "TIT2", value))
+        {
+            printf("TITLE : %s\n", value);
+            printf("-----------TITLE CHANGED SUCCESSFULLY-----------\n");
+            return 0;
+        }
+        
     }
     else if(!strcmp(tag, "-y"))
     {
-        printf("Editing Year...\n");
-        read_till_frame("TYER", value, fp, temp_fp);
+        printf("------------CHANGE THE YEAR--------------\n");
+        if(write_id3_tags(filename, "TYER", value))
+        {
+            printf("YEAR : %s\n", value);
+            printf("-----------YEAR CHANGED SUCCESSFULLY-----------\n");
+            return 0;
+        }
     }
     else if(!strcmp(tag, "-A"))
     {
-        printf("Editing Artist...\n");
-        read_till_frame("TPEI", value, fp, temp_fp);
+        printf("------------CHANGE THE ARTIST--------------\n");
+        if(write_id3_tags(filename, "TPEI", value))
+        {
+            printf("ARTIST : %s\n", value);
+            printf("-----------ARTIST CHANGED SUCCESSFULLY-----------\n");
+            return 0;
+        }
     }
     else if(!strcmp(tag, "-a"))
     {
-        printf("Editing Album...\n");
-        read_till_frame("TALB", value, fp, temp_fp);
+        printf("------------CHANGE THE ALBUM--------------\n");
+        if(write_id3_tags(filename, "TALB", value))
+        {
+            printf("ALBUM : %s\n", value);
+            printf("-----------ALBUM CHANGED SUCCESSFULLY-----------\n");
+            return 0;
+        }
     }
     else if(!strcmp(tag, "-g"))
     {
-        printf("Editing Genre...\n");
-        read_till_frame("TCON", value, fp, temp_fp);
+        printf("------------CHANGE THE GENRE--------------\n");
+        if(write_id3_tags(filename, "TCON", value))
+        {
+            printf("GENRE : %s\n", value);
+            printf("-----------GENRE CHANGED SUCCESSFULLY-----------\n");
+            return 0;
+        }
     }
     else if(!strcmp(tag, "-c"))
     {
-        printf("Editing Composer...\n");
-        read_till_frame("TCOM", value, fp, temp_fp);
+        printf("------------CHANGE THE COMPOSER--------------\n");
+        if(write_id3_tags(filename, "TCOM", value))
+        {
+            printf("COMPOSER : %s\n", value);
+            printf("-----------COMPOSER CHANGED SUCCESSFULLY-----------\n");
+            return 0;
+        }
     }
     
-    fclose(fp);
-    fclose(temp_fp);
+   return 1; //failure
 }
