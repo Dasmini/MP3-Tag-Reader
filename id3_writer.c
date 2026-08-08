@@ -10,13 +10,6 @@
 #include "id3_reader.h"
 #include "id3_utils.h"
 
-/**
- * @brief Writes the ID3 tags to an MP3 file.
- * 
- * @param filename The name of the MP3 file.
- * @param data Pointer to the TagData structure containing the ID3 tags.
- * @return 0 on success, non-zero on failure.
- */
 int read_size(int size, FILE *fp)
 {
     char read_data[size];
@@ -50,6 +43,11 @@ void skip_bytes(int size, FILE *fp)
 char *get_encode_BOM(int *value_size, int *size, FILE *fp)
 {
     char *ch = malloc(5);    //first element represents the number of cells
+    if (ch == NULL)
+    {
+        printf("Memory allocation failed!");
+        return NULL;
+    }
     int enc;
     switch(enc = fgetc(fp))
     {
@@ -104,7 +102,7 @@ void write_rem_data(FILE *fp, FILE *temp_fp)
     }
 }
 
-void write_edit_data(FILE *fp, FILE *temp_fp, const char *value)
+int write_edit_data(FILE *fp, FILE *temp_fp, const char *value)
 {
     char ch[10];
     int size;
@@ -113,6 +111,8 @@ void write_edit_data(FILE *fp, FILE *temp_fp, const char *value)
     skip_bytes(2, fp);
     int value_size = strlen(value) + 1;
     char *encode_content = get_encode_BOM(&value_size, &size, fp);
+    if (encode_content == NULL)
+        return 0;
     skip_bytes(size, fp);
     write_size_msb(value_size, temp_fp);
     fwrite(&flag_value, 2, 1, temp_fp);
@@ -128,6 +128,7 @@ void write_edit_data(FILE *fp, FILE *temp_fp, const char *value)
     }
     putc(flag_value[0], temp_fp);
     free(encode_content);
+    return 1;
 }
 
 int copy_and_edit_frame(const char *frame, const char *value, FILE *fp, FILE *temp_fp)
@@ -144,7 +145,8 @@ int copy_and_edit_frame(const char *frame, const char *value, FILE *fp, FILE *te
         fwrite(ch, 4, 1, temp_fp);
         if(strcmp(ch, frame) == 0)
         {
-            write_edit_data(fp, temp_fp, value);   
+            if(write_edit_data(fp, temp_fp, value) == 0)
+                return 0;
         }
         else
         {
@@ -185,15 +187,25 @@ int write_id3_tags(const char *filename, const char *frame, const char *value) {
     FILE *temp_fp, *fp;
     fp = fopen(filename, "rb");
     temp_fp = fopen("temp.mp3", "wb");
-    int read_result, ch;
-    read_result = copy_and_edit_frame(frame, value, fp, temp_fp);
+    if(fp == NULL || temp_fp == NULL)
+    {
+        perror("fopen");
+        return 0;
+    }
+    int edit_result, ch;
+    edit_result = copy_and_edit_frame(frame, value, fp, temp_fp);
     //code to copy temp to podcast
     fclose(fp);
     fclose(temp_fp);
-    if(read_result)
+    if (edit_result)
     {
         fp = fopen(filename, "wb");
         temp_fp = fopen("temp.mp3", "rb");
+        if(fp == NULL || temp_fp == NULL)
+        {
+            perror("fopen");
+            return 0;
+        }
         while((ch = fgetc(temp_fp)) != EOF)
         {
             fputc(ch, fp);
@@ -206,7 +218,14 @@ int write_id3_tags(const char *filename, const char *frame, const char *value) {
     return 0;
 }
 
-/** TODO: Add documentation as sample given above */
+/**
+ * @brief Writes the ID3 tags to an MP3 file.
+ * 
+ * @param filename The name of the MP3 file.
+ * @param frame Pointer to the frame name that needs to be editted
+ * @param value New value to be assigned to the selected tag.
+ * @return 1 on success, 0 on failure.
+ */
 int edit_tag(const char *filename, const char *tag, const char *value) {
     /*TagData *data = read_id3_tags(filename);
     if (!data) {

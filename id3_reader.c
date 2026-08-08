@@ -108,7 +108,7 @@ int frame_data(FILE *fp)
 
     return size;
 }
-char *get_byte_red_size(int *size, int bytes , FILE *fp)
+char *get_byte_reduced_size(int *size, int bytes , FILE *fp)
 {
     char *ch = malloc(bytes + 1);
     if(ch == NULL)
@@ -181,8 +181,8 @@ TagData* read_id3_tags(const char *filename) {
             // Inside data
             char *encoding_byte, *lang_code;
             int ch[2];
-            encoding_byte = get_byte_red_size(&size, 1 , fp);
-            lang_code = get_byte_red_size(&size, 3 , fp);
+            encoding_byte = get_byte_reduced_size(&size, 1 , fp);
+            lang_code = get_byte_reduced_size(&size, 3 , fp);
             if(encoding_byte == NULL || lang_code == NULL)
             {
                 display_error("Comment reading failed!");

@@ -29,7 +29,7 @@ typedef struct {
 TagData* create_tag_data();
 
 /**
-TODO: Add documention as sample given above
+ *@brief Frees the memory allocated for the TagData structure
  */
 void free_tag_data(TagData *data);
 
