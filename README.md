@@ -124,7 +124,6 @@ gcc *.c
     | Option | Metadata |
     | ------ | -------- |
     | `-t`   | Title    |
-    | `-T`   | Artist   |
     | `-a`   | Album    |
     | `-A`   | Artist   |
     | `-y`   | Year     |
