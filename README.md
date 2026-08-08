@@ -140,9 +140,12 @@ For Example :
 ./a.out -h
 ```
 ## 🖥️ Sample Output
-[View Metadata](/Screenshots/Display-Output-Screen.png)
-[Edit Screen](/Screenshots/Edit-output-screen.png)
-[Example Binary Format of an MP3 file header](/Screenshots/Binary-data.png)
+### View Metadata
+![View Metadata](/Screenshots/Display-Output-Screen.png)
+### Edit Screen
+![Edit Screen](/Screenshots/Edit-output-screen.png)
+### Example Binary Format of an MP3 file header
+![Example Binary Format of an MP3 file header](/Screenshots/Binary-data.png)
 
 ## 🧠 Key Concepts Learned
 - File handling
