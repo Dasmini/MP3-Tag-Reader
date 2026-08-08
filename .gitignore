@@ -5,3 +5,6 @@
 # Executables
 *.out
 *.exe
+
+# Temporary files
+temp.mp3
