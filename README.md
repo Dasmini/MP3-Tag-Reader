@@ -60,22 +60,22 @@ MP3 File
 ```
 ### Editting Metadata
 
-Original MP3
-     │
-     ▼
-Read ID3v2.3 Frames
-     │
-     ├── Unmodified Frame ──────► Copy
-     │
-     ├── Selected Frame ────────► Modify
-     │
-     └── Remaining MP3 Data ────► Copy
-                  │
-                  ▼
-             temp.mp3
-                  │
-                  ▼
-          Copy back to MP3
+    Original MP3
+        │
+        ▼
+    Read ID3v2.3 Frames
+        │
+        ├── Unmodified Frame ──────► Copy
+        │
+        ├── Selected Frame ────────► Modify
+        │
+        └── Remaining MP3 Data ────► Copy
+                    │
+                    ▼
+                temp.mp3
+                    │
+                    ▼
+            Copy back to MP3
 
 ## 📂 Project Structure
 
@@ -101,13 +101,6 @@ Read ID3v2.3 Frames
 
 ### File Handling
 - Binary file I/O
-- `fopen()`
-- `fread()`
-- `fwrite()`
-- `fgetc()`
-- `fputc()`
-- `fseek()`
-- `ftell()`
 - Temporary file handling
 
 ### MP3 / Metadata Concepts
@@ -128,15 +121,15 @@ gcc *.c
 ./a.out -v filename.mp3
 ```
 ### For Editing
-| Option | Metadata |
-| ------ | -------- |
-| `-t`   | Title    |
-| `-T`   | Artist   |
-| `-a`   | Album    |
-| `-A`   | Artist   |
-| `-y`   | Year     |
-| `-c`   | Comment  |
-| `-g`   | Genre    |
+    | Option | Metadata |
+    | ------ | -------- |
+    | `-t`   | Title    |
+    | `-T`   | Artist   |
+    | `-a`   | Album    |
+    | `-A`   | Artist   |
+    | `-y`   | Year     |
+    | `-c`   | Comment  |
+    | `-g`   | Genre    |
 
 For Example :
 ```bash
@@ -167,14 +160,14 @@ For Example :
 ## Frame layout
 
 ### TIT2 / TPE1 / TALB / TCOM / TCON / TYER
-Text Frame
-├── Frame ID       = 4 bytes
-├── Size           = 4 bytes
-├── Flags          = 2 bytes
-│
-├── Encoding       = 1 byte
-├── BOM             = FF FE        ← when Encoding = 01
-└── Text            = actual value
+    Text Frame
+    ├── Frame ID       = 4 bytes
+    ├── Size           = 4 bytes
+    ├── Flags          = 2 bytes
+    │
+    ├── Encoding       = 1 byte
+    ├── BOM             = FF FE        ← when Encoding = 01
+    └── Text            = actual value
 
 ### COMM
 
