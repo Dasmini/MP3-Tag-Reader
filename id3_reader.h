@@ -4,35 +4,86 @@
 #include "id3_utils.h"
 
 /**
-TODO: Add documention as sample given
+* @brief
+* @param
+* @return
  */
 int open_read_file(const char *filename, TagData *data);
 
+/**
+* @brief
+* @param
+* @return
+ */
 int check_file_identifier(FILE *fp);
 
+/**
+* @brief
+* @param
+* @return
+ */
 int check_version(FILE *fp);
 
+/**
+* @brief
+* @param
+* @return
+ */
 int read_integers(int size, FILE *fp);
 
+/**
+* @brief
+* @param
+* @return
+ */
 void read_character_data(int size,char *data, FILE *fp);
 
+/**
+* @brief
+* @param
+* @return
+ */
 void read_encode_BOM(int *size, FILE *fp);
 
+/**
+* @brief
+* @param
+* @return
+ */
 int frame_data(FILE *fp);
 
-char *get_byte_red_size(int *size, int bytes , FILE *fp);
 /**
-TODO: Add documention as sample given
+* @brief
+* @param
+* @return
+ */
+char *get_byte_red_size(int *size, int bytes , FILE *fp);
+
+/**
+* @brief
+* @param
+* @return
+ */
+void skip_read_bytes(int size, FILE *fp);
+
+/**
+* @brief
+* @param
+* @return
  */
 TagData* read_id3_tags(const char *filename);
 
 /**
-TODO: Add documention as sample given 
+* @brief
+* @param
+* @return
  */
 void display_metadata(const TagData *data);
 
 /**
-TODO: Add documention as sample given
+* @brief
+* @param
+* @return
  */
 void view_tags(const char *filename);
 

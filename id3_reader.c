@@ -15,6 +15,7 @@ int open_read_file(const char *filename, TagData *data)
     data -> fptr = fopen(filename, "r");
     if(data -> fptr == NULL)
     {
+        display_error("File opening failed!");
         return 0;
     }
     return 1;
@@ -23,27 +24,21 @@ int open_read_file(const char *filename, TagData *data)
 /**
 TODO: Add documention as sample given
  */
-int check_id3_tag_presence(const char *filename)
-{
-    return 0;
-}
-
-int check_file_identifier(FILE *fp)
+int check_id3_tag_presence(FILE *fp)
 {
     unsigned char ch[4];
     fread(ch, 3, 1, fp);
     ch[4] = '\0';
     if(strcmp(ch, "ID3") == 0)
     {
-        printf("ID3 read!");
         return 1;
     }
-        
+    display_error("ID3 tag not found!");  
     return 0;
 }
+
 int check_version(FILE *fp)
 {
-    printf("checking version..\n");
     char version[2];
     for (int i = 0; i < 2; i++)
     {
@@ -51,6 +46,7 @@ int check_version(FILE *fp)
     }
     if(version[0] == 3)
         return 1;
+    display_error("File is not ID3V2.3 version!");
     return 0;
 }
 
@@ -98,7 +94,7 @@ void read_encode_BOM(int *size, FILE *fp)
         case 2:
             return;
         default:
-            printf("Encode byte found not for ID3V2.3!\n");
+            display_error("Encode byte found not for ID3V2.3!");
             break;
     }
     return;
@@ -117,7 +113,7 @@ char *get_byte_red_size(int *size, int bytes , FILE *fp)
     char *ch = malloc(bytes + 1);
     if(ch == NULL)
     {
-        printf("Memory allocation Failed!\n");
+        display_error("Memory allocation Failed!");
         return NULL;
     }    
     for (int i = 0; i < bytes; i++)
@@ -127,6 +123,14 @@ char *get_byte_red_size(int *size, int bytes , FILE *fp)
     }
     ch[bytes] = '\0';
     return ch;
+}
+
+void skip_read_bytes(int size, FILE *fp)
+{
+    for(int i = 0; i < size; i++)
+        {
+            fgetc(fp);
+        }
 }
 
 /**
@@ -144,7 +148,7 @@ TagData* read_id3_tags(const char *filename) {
     }
     
     /*Check ID3 presence*/
-    if(check_file_identifier(fp) == 0)
+    if(check_id3_tag_presence(fp) == 0)
         return NULL;
 
     /*check version*/
@@ -158,7 +162,6 @@ TagData* read_id3_tags(const char *filename) {
     {
         fread(ch, 4, 1, fp);
         ch[4] = '\0';
-        printf("Tag %d : %s\n", i, ch);
         if(strcmp(ch, "TALB") == 0)
         {
             int size = frame_data(fp);
@@ -182,20 +185,14 @@ TagData* read_id3_tags(const char *filename) {
             lang_code = get_byte_red_size(&size, 3 , fp);
             if(encoding_byte == NULL || lang_code == NULL)
             {
-                printf("Comment reading failed!\n");
-                for(int i = 0; i < size; i++)
-                {
-                fgetc(fp);
-                }
+                display_error("Comment reading failed!");
+                skip_read_bytes(size, fp);
                 continue;
             }
             if(strcmp(lang_code, "eng"))
             {
-                printf("Comment Language is not english! Unable to read!\n");
-                for(int i = 0; i < size; i++)
-                {
-                fgetc(fp);
-                }
+                display_error("Comment Language is not english! Unable to read!");
+                skip_read_bytes(size, fp);
                 continue;
             }
             if(encoding_byte[0] == 1)
@@ -213,7 +210,7 @@ TagData* read_id3_tags(const char *filename) {
                     size--;
                 }while(ch[0] != '\0');
             }
-            if(encoding_byte[0] == 1)
+            if(encoding_byte[0] == 1) //description reading
             {
                 do{
                     ch[0] = getc(fp);
@@ -259,7 +256,6 @@ TagData* read_id3_tags(const char *filename) {
         }
     }
     
-
     fclose(fp);
     return data;
 }
@@ -290,6 +286,7 @@ void display_metadata(const TagData *data) {
 void display_error(const char *message)
 {
     printf("%s", message);
+    printf("\n");
 }
 
 

@@ -104,7 +104,33 @@ void write_rem_data(FILE *fp, FILE *temp_fp)
     }
 }
 
-int read_till_frame(const char *frame, const char *value, FILE *fp, FILE *temp_fp)
+void write_edit_data(FILE *fp, FILE *temp_fp, const char *value)
+{
+    char ch[10];
+    int size;
+    char flag_value[2] = {0, 0};
+    size = read_size(4, fp);
+    skip_bytes(2, fp);
+    int value_size = strlen(value) + 1;
+    char *encode_content = get_encode_BOM(&value_size, &size, fp);
+    skip_bytes(size, fp);
+    write_size_msb(value_size, temp_fp);
+    fwrite(&flag_value, 2, 1, temp_fp);
+    for (int i = 1; i <= encode_content[0]; i++)
+    {
+        putc(encode_content[i], temp_fp);
+    }
+    //Write the actual edited content
+    while(*value != '\0')
+    {
+        putc(*value, temp_fp);
+        value++;
+    }
+    putc(flag_value[0], temp_fp);
+    free(encode_content);
+}
+
+int copy_and_edit_frame(const char *frame, const char *value, FILE *fp, FILE *temp_fp)
 {
     /* read header 10 bytes*/
     char ch[10];
@@ -118,26 +144,7 @@ int read_till_frame(const char *frame, const char *value, FILE *fp, FILE *temp_f
         fwrite(ch, 4, 1, temp_fp);
         if(strcmp(ch, frame) == 0)
         {
-            char flag_value[2] = {0, 0};
-            size = read_size(4, fp);
-            skip_bytes(2, fp);
-            int value_size = strlen(value) + 1;
-            char *encode_content = get_encode_BOM(&value_size, &size, fp);
-            skip_bytes(size, fp);
-            write_size_msb(value_size, temp_fp);
-            fwrite(&flag_value, 2, 1, temp_fp);
-            for (int i = 1; i <= encode_content[0]; i++)
-            {
-                putc(encode_content[i], temp_fp);
-            }
-            //Write the actual edited content
-            while(*value != '\0')
-            {
-                putc(*value, temp_fp);
-                //putc(flag_value[0], temp_fp);
-                value++;
-            }
-            putc(flag_value[0], temp_fp);
+            write_edit_data(fp, temp_fp, value);   
         }
         else
         {
@@ -157,19 +164,45 @@ int read_till_frame(const char *frame, const char *value, FILE *fp, FILE *temp_f
     write_rem_data(fp, temp_fp);
     return 1;
 }
-
+/*
+void print_headings(const char *value)
+{
+    int len = strlen(value);
+    int total_dashes = WIDTH - len;
+    int left = total_dashes / 2;
+    int right = total_dashes - left;
+    for (int i = 0; i < left; i++)
+        printf("-");
+    printf("%s", value);
+    for (int i = 0; i < right; i++)
+        printf("-");
+    printf("\n");
+    
+}
+*/
 int write_id3_tags(const char *filename, const char *frame, const char *value) {
     // Implementation for writing ID3 tags
     FILE *temp_fp, *fp;
     fp = fopen(filename, "rb");
     temp_fp = fopen("temp.mp3", "wb");
-    int read_result;
-    read_result = read_till_frame(frame, value, fp, temp_fp);
-
+    int read_result, ch;
+    read_result = copy_and_edit_frame(frame, value, fp, temp_fp);
+    //code to copy temp to podcast
     fclose(fp);
     fclose(temp_fp);
     if(read_result)
+    {
+        fp = fopen(filename, "wb");
+        temp_fp = fopen("temp.mp3", "rb");
+        while((ch = fgetc(temp_fp)) != EOF)
+        {
+            fputc(ch, fp);
+        }
+        fclose(fp);
+        fclose(temp_fp);
+        remove("temp.mp3");
         return 1;
+    }
     return 0;
 }
 
@@ -181,10 +214,10 @@ int edit_tag(const char *filename, const char *tag, const char *value) {
     }*/
 
     
-    printf("------------SELECTED EDIT OPTION--------------\n");
+    printf("-------------SELECTED EDIT OPTION---------------\n");
     if(!strcmp(tag, "-t"))
     {
-        printf("------------CHANGE THE TITLE--------------\n");
+        printf("---------------CHANGE THE TITLE-----------------\n");
         if(write_id3_tags(filename, "TIT2", value))
         {
             printf("TITLE : %s\n", value);
